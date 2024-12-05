@@ -8,33 +8,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Criar a aplicação Flask ANTES dos decoradores
 app = Flask(__name__)
 CORS(app)
-
-@app.route('/', methods=['GET'])
-def home():
-    logger.info("Rota HOME acessada")
-    return jsonify({"status": "online"})
-
-@app.route('/search', methods=['POST'])
-def search():
-    logger.info(f"Recebendo requisição POST /search")
-    logger.info(f"Headers: {dict(request.headers)}")
-    logger.info(f"Body: {request.get_data(as_text=True)}")
-    
-    data = request.json
-    logger.info(f"Data parsed: {data}")
-    
-    query = data.get('query')
-    if not query:
-        logger.error("Query não fornecida")
-        return jsonify({"error": "Query não fornecida"}), 400
-
-    logger.info(f"Realizando pesquisa para query: {query}")
-    result = search_google(query)
-    logger.info(f"Resultado obtido: {result}")
-    
-    return jsonify({"result": result})
 
 def search_google(query):
     GOOGLE_API_KEY = "AIzaSyAKaPAmMNTzIwWMPHCpKs_LtWHHN4vSNyE"
@@ -62,6 +38,31 @@ def search_google(query):
     except Exception as e:
         logger.error(f"Erro durante a pesquisa: {str(e)}")
         return f"Erro na pesquisa: {str(e)}"
+
+@app.route('/', methods=['GET'])
+def home():
+    logger.info("Rota HOME acessada")
+    return jsonify({"status": "online"})
+
+@app.route('/search', methods=['POST'])
+def search():
+    logger.info(f"Recebendo requisição POST /search")
+    logger.info(f"Headers: {dict(request.headers)}")
+    logger.info(f"Body: {request.get_data(as_text=True)}")
+    
+    data = request.json
+    logger.info(f"Data parsed: {data}")
+    
+    query = data.get('query')
+    if not query:
+        logger.error("Query não fornecida")
+        return jsonify({"error": "Query não fornecida"}), 400
+
+    logger.info(f"Realizando pesquisa para query: {query}")
+    result = search_google(query)
+    logger.info(f"Resultado obtido: {result}")
+    
+    return jsonify({"result": result})
 
 if __name__ == '__main__':
     port = os.getenv('PORT', 8080)
