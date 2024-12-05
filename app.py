@@ -3,6 +3,20 @@ import requests
 
 app = Flask(__name__)
 
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"status": "online"})
+
+@app.route('/search', methods=['POST'])
+def search():
+    data = request.json
+    query = data.get('query')
+    if not query:
+        return jsonify({"error": "Query não fornecida"}), 400
+    
+    result = search_google(query)
+    return jsonify({"result": result})
+
 def search_google(query):
     GOOGLE_API_KEY = "AIzaSyAKaPAmMNTzIwWMPHCpKs_LtWHHN4vSNyE"
     SEARCH_ENGINE_ID = "15994e045ec3b4bee"
@@ -22,15 +36,6 @@ def search_google(query):
     except Exception as e:
         return f"Erro na pesquisa: {str(e)}"
 
-@app.route('/search', methods=['POST'])
-def search():
-    data = request.json
-    query = data.get('query')
-    if not query:
-        return jsonify({"error": "Query não fornecida"}), 400
-    
-    result = search_google(query)
-    return jsonify({"result": result})
-
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=10000)
+
