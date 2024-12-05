@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
-
 from flask_cors import CORS
-
 import requests
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -33,9 +32,7 @@ def search_google(query):
         results = response.json()
         
         if "items" in results:
-            # Coleta os snippets dos primeiros 5 resultados
             search_results = [item.get('snippet', '') for item in results['items'][:5]]
-            # Junta todos os resultados em um único texto
             combined_results = " | ".join(search_results)
             return combined_results
         else:
@@ -45,6 +42,5 @@ def search_google(query):
         return f"Erro na pesquisa: {str(e)}"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)
-
-
+    port = os.getenv('PORT', 10000)
+    app.run(host='0.0.0.0', port=port)
